@@ -26,6 +26,13 @@ export abstract class MessageService {
     }
   }
 
-  abstract sendWelcomeMessage(from: string, language: string);
+  abstract sendWelcomeMessage(from: string, localisedStrings: string);
+  abstract askForIngredients(from: string, prompt: string);
+  abstract askForDishName(from: string, prompt: string);
+  abstract askForServingSize(from: string, prompt: string);
+  abstract askForMissingIngredients(from: string, prompt: string)
+  abstract askForDietaryPreferences (from: string, localisedStrings: string);
+  abstract sendSuggestedRecipe(from:string, localisedStrings: string);
+  abstract sendModifiedRecipe(from: string, localisedStrings: string);
   abstract sendLanguageChangedMessage(from: string, language: string);
 }

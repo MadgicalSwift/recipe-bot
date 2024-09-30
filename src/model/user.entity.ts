@@ -10,6 +10,24 @@ export class User {
 
   @Column()
   language: string;
+
   @Column()
   botID: string;
+
+  @Column({ nullable: true })
+  selectedRecipeOption: string;
+
+  @Column({ type: 'text', nullable: true })
+  ingredientsList: string;
+
+  @Column({ nullable: true })
+  numberOfPeople: number;
+
+  @Column({ type: 'text', nullable: true })
+  specificDish: string;
+  
+  @Column({ type: 'text', nullable: true })
+  missingIngredients: string;
+
+  
 }

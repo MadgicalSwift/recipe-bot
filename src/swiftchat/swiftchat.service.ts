@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import { LocalizationService } from 'src/localization/localization.service';
 import { MessageService } from 'src/message/message.service';
+import { welcomeButtons, dietaryPreferencesButtons } from 'src/i18n/buttons/button';
 
 dotenv.config();
 
@@ -21,11 +22,72 @@ export class SwiftchatMessageService extends MessageService {
       },
     };
   }
-  async sendWelcomeMessage(from: string, language: string) {
-    const localisedStrings = LocalizationService.getLocalisedString(language);
+  async sendWelcomeMessage(from: string, localisedStrings: string) {
+    
+    const messageData = welcomeButtons(from, localisedStrings);
+
+    const response = await this.sendMessage(
+      this.baseUrl,
+      messageData,
+      this.apiKey,
+    );
+    return response;
+  }
+ 
+  async askForDietaryPreferences(from: string, localisedStrings: string) {
+  
+    const messageData = dietaryPreferencesButtons(from, localisedStrings)
+  
+    const response = await this.sendMessage(
+          this.baseUrl,
+          messageData,
+          this.apiKey,
+        );
+        return response;
+  }
+  
+  async askForIngredients(from: string, prompt: string) {
+    const requestData = this.prepareRequestData(from, prompt);
+
+    const response = await this.sendMessage(
+      this.baseUrl,
+      requestData,
+      this.apiKey,
+    );
+  }
+
+  async askForDishName(from: string, prompt: string) {
+    const requestData = this.prepareRequestData(from, prompt);
+
+    const response = await this.sendMessage(
+      this.baseUrl,
+      requestData,
+      this.apiKey,
+    );
+  }
+
+  async askForServingSize(from: string, prompt: string) {
+    const requestData = this.prepareRequestData(from, prompt);
+    const response = await this.sendMessage(
+      this.baseUrl,
+      requestData,
+      this.apiKey,
+    );
+  }
+  async askForMissingIngredients(from: string, prompt: string) {
+    
+    const requestData = this.prepareRequestData(from, prompt);
+    const response = await this.sendMessage(
+      this.baseUrl,
+      requestData,
+      this.apiKey,
+    );
+  }
+
+  async sendSuggestedRecipe(from:string, localisedStrings: string){
     const requestData = this.prepareRequestData(
       from,
-      localisedStrings.welcomeMessage,
+      localisedStrings,
     );
 
     const response = await this.sendMessage(
@@ -35,7 +97,19 @@ export class SwiftchatMessageService extends MessageService {
     );
     return response;
   }
+  async sendModifiedRecipe(from: string, localisedStrings: string){
+    const requestData = this.prepareRequestData(
+      from,
+      localisedStrings,
+    );
 
+    const response = await this.sendMessage(
+      this.baseUrl,
+      requestData,
+      this.apiKey,
+    );
+    return response;
+  }
   async sendLanguageChangedMessage(from: string, language: string) {
     const localisedStrings = LocalizationService.getLocalisedString(language);
     const requestData = this.prepareRequestData(
