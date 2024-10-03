@@ -8,6 +8,8 @@ import { UserService } from 'src/model/user.service';
 import { SwiftchatMessageService } from 'src/swiftchat/swiftchat.service';
 import { MessageService } from 'src/message/message.service';
 import { UserModule } from 'src/model/user.module';
+import { MixpanelService } from 'src/mixpanel/mixpanel.service';
+
 // import { MockUserService } from 'src/model/mockuser.service';
 
 @Module({
@@ -20,6 +22,7 @@ import { UserModule } from 'src/model/user.module';
       provide: MessageService,
       useClass: SwiftchatMessageService,
     },
+    MixpanelService,
   ],
   exports: [ChatbotService, IntentClassifier],
 })

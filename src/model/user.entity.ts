@@ -12,7 +12,7 @@ export class User {
   language: string;
 
   @Column()
-  botID: string;
+  Botid: string;
 
   @Column({ nullable: true })
   selectedRecipeOption: string;

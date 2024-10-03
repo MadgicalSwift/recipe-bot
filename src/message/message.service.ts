@@ -2,9 +2,11 @@ import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import { CustomException } from 'src/common/exception/custom.exception';
 import { localisedStrings } from 'src/i18n/en/localised-strings';
+import { MixpanelService } from 'src/mixpanel/mixpanel.service';
 
 @Injectable()
 export abstract class MessageService {
+  constructor(public readonly mixpanel: MixpanelService) {}
   async prepareWelcomeMessage() {
     return localisedStrings.welcomeMessage;
   }
@@ -12,13 +14,17 @@ export abstract class MessageService {
     return localisedStrings.seeMoreMessage;
   }
 
-  async sendMessage(baseUrl: string, requestData: any, token: string) {
-    try {
+ async sendMessage(baseUrl: string, requestData: any, token: string) {
+   try {
+      console.log("Sending request to:", baseUrl);
+      console.log("Request Data:", JSON.stringify(requestData, null, 2));
+      console.log("Authorization Token:", token);
+      
       const response = await axios.post(baseUrl, requestData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+         headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+         },
       });
       return response.data;
     } catch (error) {
