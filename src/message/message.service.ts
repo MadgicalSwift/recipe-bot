@@ -16,10 +16,6 @@ export abstract class MessageService {
 
  async sendMessage(baseUrl: string, requestData: any, token: string) {
    try {
-      console.log("Sending request to:", baseUrl);
-      console.log("Request Data:", JSON.stringify(requestData, null, 2));
-      console.log("Authorization Token:", token);
-      
       const response = await axios.post(baseUrl, requestData, {
          headers: {
             Authorization: `Bearer ${token}`,
@@ -38,7 +34,8 @@ export abstract class MessageService {
   abstract askForServingSize(from: string, prompt: string);
   abstract askForMissingIngredients(from: string, prompt: string)
   abstract askForDietaryPreferences (from: string, localisedStrings: string);
-  abstract sendSuggestedRecipe(from:string, localisedStrings: string);
-  abstract sendModifiedRecipe(from: string, localisedStrings: string);
+  abstract sendSuggestedRecipe(from:string, localisedStrings: string, result: any);
+  abstract sendModifiedRecipe(from: string, localisedStrings: string, result: any);
+  abstract sendAwesomeRecipePrompt(from: string, localisedStrings: string);
   abstract sendLanguageChangedMessage(from: string, language: string);
 }

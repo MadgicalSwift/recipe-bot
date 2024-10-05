@@ -84,7 +84,22 @@ export class SwiftchatMessageService extends MessageService {
     );
   }
 
-  async sendSuggestedRecipe(from:string, localisedStrings: string){
+  async sendSuggestedRecipe(from:string, localisedStrings: string, result: any){
+    const messageContent = `${localisedStrings}\n${result}`;
+    const requestData = this.prepareRequestData(
+      from,
+      messageContent,
+    );
+
+    const response = await this.sendMessage(
+      this.baseUrl,
+      requestData,
+      this.apiKey,
+    );
+    return response;
+  }
+
+  async sendAwesomeRecipePrompt(from: string, localisedStrings: string){
     const requestData = this.prepareRequestData(
       from,
       localisedStrings,
@@ -97,10 +112,11 @@ export class SwiftchatMessageService extends MessageService {
     );
     return response;
   }
-  async sendModifiedRecipe(from: string, localisedStrings: string){
+  async sendModifiedRecipe(from: string, localisedStrings: string, result: any){
+    const messageContent = `${localisedStrings}\n${result}`;
     const requestData = this.prepareRequestData(
       from,
-      localisedStrings,
+      messageContent,
     );
 
     const response = await this.sendMessage(
