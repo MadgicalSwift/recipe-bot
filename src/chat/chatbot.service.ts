@@ -36,14 +36,6 @@ export class ChatbotService {
       userData = await this.userService.createUser(from, 'english', botID);
     }
   
-    console.log("userdata====", userData);
-// if (userData === undefined) {
-//       console.log('Userdata is undefined');
-//       return 'ok';
-//     } else {
-//      await this.userService.deleteUser(from, botID);
-//      return 'ok';
-//     }
     const localisedStrings = LocalizationService.getLocalisedString(
       userData.language,
     );
@@ -80,6 +72,10 @@ export class ChatbotService {
           localisedStrings.awesomeRecipePrompt,
         );
         const result = await suggestRecipe(userData, buttonBody);
+        if(!result){
+          console.log("Result not found")
+          return 'ok'
+        }
     
       const trackingData = {
         distinct_id: from,
@@ -89,10 +85,16 @@ export class ChatbotService {
 
       // Track button click using Mixpanel
       this.mixpanel.track('Suggested_Recipe', trackingData);
-        // const recipeTitle = result.split('\n')[0].split(':')[1].trim();
+        
         const recipeName = result.split('\n')[0].trim();
         const recipeSuggestion = localisedStrings.recipeSuggestion(recipeName);
         await this.message.sendSuggestedRecipe(from, recipeSuggestion, result);
+        await this.message.mainMenubuttons(from,localisedStrings)
+        userData.ingredientsList = null;
+        
+        userData.specificDish = null;
+        userData.missingIngredients = null;
+        await this.userService.saveUser(userData);
       }
 
       // Save user data after any button response
@@ -134,6 +136,10 @@ export class ChatbotService {
             localisedStrings.awesomeRecipePrompt,
           );
           const result = await modifiedRecipe(userData);
+          if(!result){
+            console.log("Result not found")
+            return 'ok'
+          }
           const trackingData = {
             distinct_id: from,
             recipe: result,
@@ -142,9 +148,7 @@ export class ChatbotService {
     
           // Track button click using Mixpanel
           this.mixpanel.track('Modified_Recipe', trackingData);
-          // const recipeTitle = result.split('\n')[0].split(':')[1].trim();
-          // const title = result.split('\n')[0].replace(/.*: /, '').trim();
-          // const title = result.split('\n')[0].replace(/.*:\s*/, '').trim();
+         
           const title = result.split('\n')[0].replace(/.*:\s*/, '').replace(/^\*\*\s*/, '').trim();
           const modifiedRecipeSuggestion =
             localisedStrings.modifiedRecipeSuggestion(title);
@@ -153,6 +157,13 @@ export class ChatbotService {
             modifiedRecipeSuggestion,
             result,
           );
+          await this.message.mainMenubuttons(from,localisedStrings)
+          userData.ingredientsList = null;
+        
+          userData.specificDish = null;
+          userData.missingIngredients = null;
+          await this.userService.saveUser(userData);
+        
         } else if (userData.specificDish) {
           userData.missingIngredients = message;
           await this.userService.saveUser(userData);
@@ -195,7 +206,6 @@ async function suggestRecipe(userData: any, buttonBody: string) {
     return response.data; // Return the result here
   } catch (error) {
     console.error('Error suggesting recipe:', error);
-    throw error; // Propagate the error
   }
 }
 
@@ -219,7 +229,6 @@ async function modifiedRecipe(userData: any) {
     return response.data; // Return the result here
   } catch (error) {
     console.error('Error suggesting recipe:', error);
-    throw error; // Propagate the error
   }
 }
 

@@ -37,5 +37,6 @@ export abstract class MessageService {
   abstract sendSuggestedRecipe(from:string, localisedStrings: string, result: any);
   abstract sendModifiedRecipe(from: string, localisedStrings: string, result: any);
   abstract sendAwesomeRecipePrompt(from: string, localisedStrings: string);
+  abstract mainMenubuttons(from:string, localisedStrings: any);
   abstract sendLanguageChangedMessage(from: string, language: string);
 }

@@ -1,67 +1,34 @@
-// import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-// @Entity()
-// export class User {
-//   @PrimaryGeneratedColumn()
-//   id: number;
-
-//   @Column({ unique: false })
-//   mobileNumber: string;
-
-//   @Column()
-//   language: string;
-
-//   @Column()
-//   Botid: string;
-
-//   @Column({ nullable: true })
-//   selectedRecipeOption: string;
-
-//   @Column({ type: 'text', nullable: true })
-//   ingredientsList: string;
-
-//   @Column({ nullable: true })
-//   numberOfPeople: string;
-
-//   @Column({ type: 'text', nullable: true })
-//   specificDish: string;
-  
-//   @Column({ type: 'text', nullable: true })
-//   missingIngredients: string;
-
-  
-// }
-
-
-import { IsString, IsOptional,IsInt  } from 'class-validator';
-
+@Entity()
 export class User {
-  @IsString()
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column({ unique: false })
   mobileNumber: string;
 
-  @IsString()
+  @Column()
   language: string;
 
-  @IsString()
-  Botid: string; // Changed to lowercase 'b' for consistency
+  @Column()
+  Botid: string;
 
-  @IsOptional()
-  @IsString()
-  selectedRecipeOption?: string; // Optional
+  @Column({ nullable: true })
+  selectedRecipeOption: string;
 
-  @IsOptional()
-  @IsString()
-  ingredientsList?: string; // Optional
+  @Column({ type: 'text', nullable: true })
+  ingredientsList: string;
 
-  @IsOptional()
-  @IsInt() // Validate as integer
-  numberOfPeople?: number | string;  // Optional
+  @Column({ nullable: true })
+  numberOfPeople: string;
 
-  @IsOptional()
-  @IsString()
-  specificDish?: string; // Optional
+  @Column({ type: 'text', nullable: true })
+  specificDish: string;
+  
+  @Column({ type: 'text', nullable: true })
+  missingIngredients: string;
 
-  @IsOptional()
-  @IsString()
-  missingIngredients?: string; // Optional
+  
 }
+

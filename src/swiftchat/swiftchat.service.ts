@@ -126,6 +126,42 @@ export class SwiftchatMessageService extends MessageService {
     );
     return response;
   }
+
+async mainMenubuttons(from:string, localisedStrings: any){
+
+  const messageData = {
+    to: from,
+    type: 'button',
+    button: {
+        body: {
+        type: 'text',
+        text: {
+            body: localisedStrings.mainMenu
+        },
+        },
+        buttons: [
+        {
+            type: 'solid',
+            body: localisedStrings.suggestRecipeOption,
+            reply: localisedStrings.suggestRecipeOption,
+        },
+        {
+            type: 'solid',
+            body: localisedStrings.specificDishOption,
+            reply: localisedStrings.specificDishOption,
+        },
+        ],
+        allow_custom_response: false,
+    }
+  }
+
+  const response = await this.sendMessage(
+    this.baseUrl,
+    messageData,
+    this.apiKey
+  )
+}
+
   async sendLanguageChangedMessage(from: string, language: string) {
     const localisedStrings = LocalizationService.getLocalisedString(language);
     const requestData = this.prepareRequestData(
