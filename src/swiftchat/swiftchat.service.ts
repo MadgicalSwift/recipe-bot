@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import { LocalizationService } from 'src/localization/localization.service';
 import { MessageService } from 'src/message/message.service';
-import { welcomeButtons, dietaryPreferencesButtons } from 'src/i18n/buttons/button';
+import { welcomeButtons, dietaryPreferencesButtons, menuButtons, sendButtonsAfterRecipe, buttonsAfterFollowRecipe, buttonsWithRecipeConversation} from 'src/i18n/buttons/button';
 
 dotenv.config();
 
@@ -84,12 +84,15 @@ export class SwiftchatMessageService extends MessageService {
     );
   }
 
-  async sendSuggestedRecipe(from:string, localisedStrings: string, result: any){
-    const messageContent = `${localisedStrings}\n${result}`;
-    const requestData = this.prepareRequestData(
-      from,
-      messageContent,
-    );
+  async sendSuggestedRecipe(from:string, localisedStrings: string, result: any, language: string){
+    // const messageContent = `${localisedStrings}\n${result}`;
+
+    // const requestData = this.prepareRequestData(
+    //   from,
+    //   messageContent,
+    // );
+    const strings = LocalizationService.getLocalisedString(language);
+    const requestData =  sendButtonsAfterRecipe(from, localisedStrings, result, strings)
 
     const response = await this.sendMessage(
       this.baseUrl,
@@ -112,13 +115,10 @@ export class SwiftchatMessageService extends MessageService {
     );
     return response;
   }
-  async sendModifiedRecipe(from: string, localisedStrings: string, result: any){
-    const messageContent = `${localisedStrings}\n${result}`;
-    const requestData = this.prepareRequestData(
-      from,
-      messageContent,
-    );
-
+  async sendSpecificRecipe(from: string, localisedStrings: string, result: any, language: string){
+    
+    const strings = LocalizationService.getLocalisedString(language);
+    const requestData =  sendButtonsAfterRecipe(from, localisedStrings, result, strings)
     const response = await this.sendMessage(
       this.baseUrl,
       requestData,
@@ -127,39 +127,93 @@ export class SwiftchatMessageService extends MessageService {
     return response;
   }
 
+  async sendFollowRecipe(from: string, localisedStrings: any, result: any){
+const messageData = buttonsAfterFollowRecipe(from, localisedStrings, result)
+  
+          const response = await this.sendMessage(
+            this.baseUrl,
+            messageData,
+            this.apiKey,
+          );
+          return response;
+  }
 async mainMenubuttons(from:string, localisedStrings: any){
 
-  const messageData = {
-    to: from,
-    type: 'button',
-    button: {
-        body: {
-        type: 'text',
-        text: {
-            body: localisedStrings.mainMenu
-        },
-        },
-        buttons: [
-        {
-            type: 'solid',
-            body: localisedStrings.suggestRecipeOption,
-            reply: localisedStrings.suggestRecipeOption,
-        },
-        {
-            type: 'solid',
-            body: localisedStrings.specificDishOption,
-            reply: localisedStrings.specificDishOption,
-        },
-        ],
-        allow_custom_response: false,
-    }
-  }
+  const messageData = menuButtons(from, localisedStrings)
 
   const response = await this.sendMessage(
     this.baseUrl,
     messageData,
     this.apiKey
   )
+}
+
+// async sendButtonsAfterRecipe(from: string, localisedStrings: any){
+//   const messageData = {
+//     to: from,
+//     type: 'button',
+//     button: {
+//         body: {
+//         type: 'text',
+//         text: {
+//             body: 'choose language'
+//         },
+//         },
+//         buttons: [
+//         {
+//             type: 'solid',
+//             body: 'Hindi',
+//             reply: 'Hindi',
+//         },
+//         {
+//             type: 'solid',
+//             body: 'English',
+//             reply: 'English',
+//         },
+//         ],
+//         allow_custom_response: false,
+//     },
+//     };
+// }
+
+async sendFollowUpPrompt(from: string, localisedStrings: string){
+  const requestData = this.prepareRequestData(
+    from,
+    localisedStrings,
+  );
+
+  const response = await this.sendMessage(
+    this.baseUrl,
+    requestData,
+    this.apiKey,
+  );
+  return response;
+}
+
+
+async sendConversation(from: string, message: any){
+  const requestData = this.prepareRequestData(
+    from,
+    message,
+  );
+
+  const response = await this.sendMessage(
+    this.baseUrl,
+    requestData,
+    this.apiKey,
+  );
+  return response;
+}
+
+async sendButtonsWithRecipeConversation(from: string, localisedStrings: any, message: any){
+  const messageData = buttonsWithRecipeConversation(from, localisedStrings, message)
+
+        const response = await this.sendMessage(
+          this.baseUrl,
+          messageData,
+          this.apiKey,
+        );
+        return response;
 }
 
   async sendLanguageChangedMessage(from: string, language: string) {

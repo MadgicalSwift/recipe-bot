@@ -34,9 +34,13 @@ export abstract class MessageService {
   abstract askForServingSize(from: string, prompt: string);
   abstract askForMissingIngredients(from: string, prompt: string)
   abstract askForDietaryPreferences (from: string, localisedStrings: string);
-  abstract sendSuggestedRecipe(from:string, localisedStrings: string, result: any);
-  abstract sendModifiedRecipe(from: string, localisedStrings: string, result: any);
+  abstract sendSuggestedRecipe(from:string, localisedStrings: string, result: any, language: string);
+  abstract sendSpecificRecipe(from: string, localisedStrings: string, result: any, language: string);
   abstract sendAwesomeRecipePrompt(from: string, localisedStrings: string);
   abstract mainMenubuttons(from:string, localisedStrings: any);
+  abstract sendFollowUpPrompt(from: string, localisedStrings: string);
+  abstract sendFollowRecipe(from: string, localisedStrings: any, result: any);
+  abstract sendConversation(from: string, message: any);
+  abstract sendButtonsWithRecipeConversation(from: string, localisedStrings: any,message: any);
   abstract sendLanguageChangedMessage(from: string, language: string);
 }

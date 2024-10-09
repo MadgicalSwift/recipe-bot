@@ -20,7 +20,7 @@ async createUser(
       Botid: botID,
     };
     
-    console.log("Creating new user ", newUser);
+    // console.log("Creating new user ", newUser);
     const params = {
       TableName: USERS_TABLE,
       Item: newUser,
@@ -62,9 +62,33 @@ async createUser(
         ingredientsList: user.ingredientsList,
         numberOfPeople: user.numberOfPeople,
         specificDish: user.specificDish,
-        missingIngredients: user.missingIngredients
+        dietaryPreference: user.dietaryPreference,
+        follow_up: user.follow_up,
+        full_dish:user.full_dish,
+        chat_history: user.chat_history,
+        chat_summary: user.chat_summary,
+        recipe_conversation_Api_No: user.recipe_conversation_Api_No
+
       },
     };
     return await dynamoDBClient().put(updateUser).promise();
+  }
+
+  async deleteUser(mobileNumber: string, Botid: string): Promise<void> {
+    try {
+      const params = {
+        TableName: USERS_TABLE,
+        Key: {
+          mobileNumber: mobileNumber,
+          Botid: Botid,
+        },
+      };
+      await dynamoDBClient().delete(params).promise();
+      console.log(
+        `User with mobileNumber ${mobileNumber} and Botid ${Botid} deleted successfully.`,
+      );
+    } catch (error) {
+      console.error('Error deleting user from DynamoDB:', error);
+    }
   }
 }
