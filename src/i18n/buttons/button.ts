@@ -14,7 +14,7 @@ export function welcomeButtons(from: string, localisedStrings: any) {
       type: 'solid',
       body: localisedStrings.helpByAIOption,
       reply: localisedStrings.helpByAIOption,
-    }
+    },
   ];
 
   return {
@@ -86,14 +86,19 @@ export function menuButtons(from: string, localisedStrings: any) {
           type: 'solid',
           body: localisedStrings.helpByAIOption,
           reply: localisedStrings.helpByAIOption,
-        }
+        },
       ],
       allow_custom_response: false,
     },
   };
 }
 
-export function sendButtonsAfterRecipe(from: string, localisedStrings: any, result: any, strings:any){
+export function sendButtonsAfterRecipe(
+  from: string,
+  localisedStrings: any,
+  result: any,
+  strings: any,
+) {
   return {
     to: from,
     type: 'button',
@@ -121,63 +126,66 @@ export function sendButtonsAfterRecipe(from: string, localisedStrings: any, resu
   };
 }
 
-
-export function buttonsAfterFollowRecipe(from: string, localisedStrings: any, result: any){
-
-  return{
+export function buttonsAfterFollowRecipe(
+  from: string,
+  localisedStrings: any,
+  result: any,
+) {
+  return {
     to: from,
     type: 'button',
     button: {
-        body: {
+      body: {
         type: 'text',
         text: {
-            body: result
+          body: result,
         },
-        },
-        buttons: [
-        {
-            type: 'solid',
-            body: localisedStrings.optionMainMenu,
-            reply: localisedStrings.optionMainMenu,
-        },
-        {
-            type: 'solid',
-            body: localisedStrings.optionFollowUp,
-            reply: localisedStrings.optionFollowUp,
-        },
-        ],
-        allow_custom_response: false,
-    },
-  }
-}
-
-
-export function buttonsWithRecipeConversation(from: string, localisedStrings: any,message: any){
-return{
-
-  to: from,
-  type: 'button',
-  button: {
-      body: {
-      type: 'text',
-      text: {
-          body: message
-      },
       },
       buttons: [
-      {
+        {
           type: 'solid',
           body: localisedStrings.optionMainMenu,
           reply: localisedStrings.optionMainMenu,
+        },
+        {
+          type: 'solid',
+          body: localisedStrings.optionFollowUp,
+          reply: localisedStrings.optionFollowUp,
+        },
+      ],
+      allow_custom_response: false,
+    },
+  };
+}
+
+export function buttonsWithRecipeConversation(
+  from: string,
+  localisedStrings: any,
+  message: any,
+) {
+  return {
+    to: from,
+    type: 'button',
+    button: {
+      body: {
+        type: 'text',
+        text: {
+          body: message,
+        },
       },
-      {
+      buttons: [
+        {
+          type: 'solid',
+          body: localisedStrings.optionMainMenu,
+          reply: localisedStrings.optionMainMenu,
+        },
+        {
           type: 'solid',
           body: localisedStrings.continueQueryOption,
           reply: localisedStrings.continueQueryOption,
-      },
+        },
       ],
       allow_custom_response: false,
-  },
-
-}
+    },
+  };
 }

@@ -35,17 +35,11 @@ export class ChatbotService {
       console.log('User not found, Creating new user');
       userData = await this.userService.createUser(from, 'english', botID);
     }
+    const today = new Date().toISOString().split('T')[0];
 
-    // if (userData === undefined) {
-    //   console.log('Userdata is undefined');
-    //   return 'ok';
-    // } else {
-    //   console.log('User data====', userData);
-    //  await this.userService.deleteUser(from, botID);
-    //  return 'ok';
-    // }
-    // console.log('UserData=====', userData);
-    // console.log(userData.recipe_conversation_Api_No);
+    // userData.date = '2024-10-09';
+    // await this.userService.saveUser(userData);
+
     const localisedStrings = LocalizationService.getLocalisedString(
       userData.language,
     );
@@ -83,12 +77,32 @@ export class ChatbotService {
           from,
           localisedStrings.awesomeRecipePrompt,
         );
+
+        if (userData.date < today) {
+          userData.date = today; // Update userData.date to today
+          userData.apiUsageCount =
+            typeof userData.apiUsageCount === 'number'
+              ? (userData.apiUsageCount = 0)
+              : 0;
+          await this.userService.saveUser(userData);
+        } else if (userData.apiUsageCount >= 20) {
+          await this.message.sendlimitreached(
+            from,
+            localisedStrings.reacheddailylimit,
+          );
+          return 'ok';
+        }
+
         const result = await suggestRecipe(userData);
         if (!result) {
           console.log('Result not found');
           return 'ok';
         }
-
+        userData.date = today;
+        userData.apiUsageCount =
+          typeof userData.apiUsageCount === 'number'
+            ? userData.apiUsageCount + 1
+            : 1;
         userData.full_dish = result;
         await this.userService.saveUser(userData);
         const trackingData = {
@@ -124,28 +138,63 @@ export class ChatbotService {
           localisedStrings.followUpPrompt,
         );
       } else if (buttonBody === localisedStrings.helpByAIOption) {
+        if (userData.date < today) {
+          userData.date = today; // Update userData.date to today
+          userData.apiUsageCount =
+            typeof userData.apiUsageCount === 'number'
+              ? (userData.apiUsageCount = 0)
+              : 0;
+          await this.userService.saveUser(userData);
+        } else if (userData.apiUsageCount >= 20) {
+          await this.message.sendlimitreached(
+            from,
+            localisedStrings.reacheddailylimit,
+          );
+          return 'ok';
+        }
+
         const response = await recipeConversation(userData, buttonBody);
         userData.selectedRecipeOption = null;
         userData.chat_history = response.full_history;
         userData.chat_summary = response.summary_history;
-        // userData.recipe_conversation_Api_No += 1;
+        userData.date = today;
+        userData.apiUsageCount =
+          typeof userData.apiUsageCount === 'number'
+            ? userData.apiUsageCount + 1
+            : 1;
+
         userData.recipe_conversation_Api_No =
           typeof userData.recipe_conversation_Api_No === 'number'
             ? userData.recipe_conversation_Api_No + 1
             : 1;
-        // if (!isNaN(userData.recipe_conversation_Api_No)) {
-        //   await this.userService.saveUser(userData);
-        // } else {
-        //   console.error("recipe_conversation_Api_No is NaN");
-        // }
+
         await this.message.sendConversation(from, response.response);
       } else if (buttonBody === localisedStrings.continueQueryOption) {
+        if (userData.date < today) {
+          userData.date = today; // Update userData.date to today
+          userData.apiUsageCount =
+            typeof userData.apiUsageCount === 'number'
+              ? (userData.apiUsageCount = 0)
+              : 0;
+          await this.userService.saveUser(userData);
+        } else if (userData.apiUsageCount >= 20) {
+          await this.message.sendlimitreached(
+            from,
+            localisedStrings.reacheddailylimit,
+          );
+          return 'ok';
+        }
         const response = await recipeConversation(userData, buttonBody);
-        // console.log("response==", response);
+
         userData.selectedRecipeOption = null;
         userData.chat_history = response.full_history;
         userData.chat_summary = response.summary_history;
         userData.recipe_conversation_Api_No += 1;
+        userData.date = today;
+        userData.apiUsageCount =
+          typeof userData.apiUsageCount === 'number'
+            ? userData.apiUsageCount + 1
+            : 1;
         await this.userService.saveUser(userData);
 
         if (userData.recipe_conversation_Api_No >= 5) {
@@ -156,7 +205,7 @@ export class ChatbotService {
             localisedStrings,
             response.response,
           );
-          // console.log("no")
+
           return 'ok';
         }
         await this.message.sendConversation(from, response.response);
@@ -175,14 +224,9 @@ export class ChatbotService {
         userData.follow_up = null;
         userData.specificDish = null;
         userData.selectedRecipeOption = null;
-        // userData.missingIngredients = null;
-        //       userData.recipe_conversation_Api_No =
-        // typeof userData.recipe_conversation_Api_No === 'number'
-        // ? userData.recipe_conversation_Api_No + 1 // Increment by 1 if it's a number
-        // : 0;
         userData.recipe_conversation_Api_No =
           typeof userData.recipe_conversation_Api_No === 'number'
-            ? userData.recipe_conversation_Api_No = 0 
+            ? (userData.recipe_conversation_Api_No = 0)
             : 0;
         userData.chat_history = [];
         userData.chat_summary = '';
@@ -195,14 +239,35 @@ export class ChatbotService {
           await this.userService.saveUser(userData);
 
           const fullDish = userData.full_dish;
+
+          if (userData.date < today) {
+            userData.date = today; // Update userData.date to today
+            userData.apiUsageCount =
+              typeof userData.apiUsageCount === 'number'
+                ? (userData.apiUsageCount = 0)
+                : 0;
+            await this.userService.saveUser(userData);
+          } else if (userData.apiUsageCount >= 20) {
+            await this.message.sendlimitreached(
+              from,
+              localisedStrings.reacheddailylimit,
+            );
+            return 'ok';
+          }
+
           const response = await followUpDish(userData, message, fullDish);
           if (!response) {
             console.log('response not found');
             return 'ok';
           }
-          // console.log("response====", response);
+
           userData.chat_history = response.full_history;
           userData.chat_summary = response.summary_history;
+          userData.date = today;
+          userData.apiUsageCount =
+            typeof userData.apiUsageCount === 'number'
+              ? userData.apiUsageCount + 1
+              : 1;
           await this.userService.saveUser(userData);
 
           await this.message.sendFollowRecipe(
@@ -229,14 +294,33 @@ export class ChatbotService {
           await this.userService.saveUser(userData);
 
           const fullDish = userData.full_dish;
+          if (userData.date < today) {
+            userData.date = today; // Update userData.date to today
+            userData.apiUsageCount =
+              typeof userData.apiUsageCount === 'number'
+                ? (userData.apiUsageCount = 0)
+                : 0;
+            await this.userService.saveUser(userData);
+          } else if (userData.apiUsageCount >= 20) {
+            await this.message.sendlimitreached(
+              from,
+              localisedStrings.reacheddailylimit,
+            );
+            return 'ok';
+          }
           const response = await followUpDish(userData, message, fullDish);
           if (!response) {
             console.log('response not found');
             return 'ok';
           }
-          // console.log("response====", response);
+
           userData.chat_history = response.full_history;
           userData.chat_summary = response.summary_history;
+          userData.date = today;
+          userData.apiUsageCount =
+            typeof userData.apiUsageCount === 'number'
+              ? userData.apiUsageCount + 1
+              : 1;
           await this.userService.saveUser(userData);
 
           await this.message.sendFollowRecipe(
@@ -251,11 +335,32 @@ export class ChatbotService {
             from,
             localisedStrings.awesomeRecipePrompt,
           );
+          if (userData.date < today) {
+            userData.date = today; // Update userData.date to today
+            userData.apiUsageCount =
+              typeof userData.apiUsageCount === 'number'
+                ? (userData.apiUsageCount = 0)
+                : 0;
+            await this.userService.saveUser(userData);
+          } else if (userData.apiUsageCount >= 20) {
+            await this.message.sendlimitreached(
+              from,
+              localisedStrings.reacheddailylimit,
+            );
+            return 'ok';
+          }
+
           const result = await specificRecipe(userData);
           if (!result) {
             console.log('Result not found');
             return 'ok';
           }
+
+          userData.apiUsageCount =
+            typeof userData.apiUsageCount === 'number'
+              ? userData.apiUsageCount + 1
+              : 1;
+          userData.date = today;
           userData.full_dish = result;
           await this.userService.saveUser(userData);
           const trackingData = {
@@ -280,30 +385,38 @@ export class ChatbotService {
             result,
             userData.language,
           );
-          // } else if (userData.specificDish) {
-          //   userData.missingIngredients = message;
-          //   await this.userService.saveUser(userData);
-          //   await this.message.askForServingSize(
-          //     from,
-          //     localisedStrings.servingSizePrompt,
-          //   );
         } else {
           userData.specificDish = message;
           userData.dietaryPreference = 'null';
           userData.ingredientsList = 'null';
           await this.userService.saveUser(userData);
-          // await this.message.askForMissingIngredients(
-          //   from,
-          //   localisedStrings.missingIngredientsPrompt,
-          // );
           await this.message.askForServingSize(
             from,
             localisedStrings.servingSizePrompt,
           );
         }
       } else {
+        if (userData.date < today) {
+          userData.date = today; // Update userData.date to today
+          userData.apiUsageCount =
+            typeof userData.apiUsageCount === 'number'
+              ? (userData.apiUsageCount = 0)
+              : 0;
+          await this.userService.saveUser(userData);
+        } else if (userData.apiUsageCount >= 20) {
+          await this.message.sendlimitreached(
+            from,
+            localisedStrings.reacheddailylimit,
+          );
+          return 'ok';
+        }
         const response = await recipeConversation(userData, message);
-        // console.log("response==", response);
+
+        userData.apiUsageCount =
+          typeof userData.apiUsageCount === 'number'
+            ? userData.apiUsageCount + 1
+            : 1;
+        userData.date = today;
         userData.selectedRecipeOption = null;
         userData.chat_history = response.full_history;
         userData.chat_summary = response.summary_history;
@@ -320,7 +433,7 @@ export class ChatbotService {
             localisedStrings,
             response.response,
           );
-          // console.log("no")
+
           return 'ok';
         } else if (response.response.includes('**')) {
           await this.message.sendButtonsWithRecipeConversation(
@@ -340,7 +453,6 @@ export class ChatbotService {
 
 async function followUpDish(userData: any, message: string, fullDish: any) {
   const url = process.env.FOLLOW_UP_URL;
-
   const data = {
     chat_history: userData.chat_history,
     full_dish: fullDish,
@@ -352,7 +464,6 @@ async function followUpDish(userData: any, message: string, fullDish: any) {
     bot_name: process.env.BOT_NAME,
   };
 
-  // console.log("Data=====", data);
   try {
     const response = await axios.post(url, data, {
       headers: {
@@ -364,12 +475,12 @@ async function followUpDish(userData: any, message: string, fullDish: any) {
     return response.data; // Return the response from the server
   } catch (error) {
     console.error('Error in follow-up dish request:', error);
-    throw error; // Propagate the error
   }
 }
 
 async function suggestRecipe(userData: any) {
   const url = process.env.SUGGEST_RECIPE_URL;
+
   const data = {
     ingredients: userData.ingredientsList,
     people: userData.numberOfPeople,
@@ -414,15 +525,14 @@ async function specificRecipe(userData: any) {
 }
 
 async function recipeConversation(userData: any, message: any) {
-  const url =  process.env.RECIPE_COVERSATION_URL
-
+  const url = process.env.RECIPE_COVERSATION_URL;
   const data = {
     chat_history: userData.chat_history,
     question: message,
     chat_summary: userData.chat_summary,
     bot_name: process.env.BOT_NAME,
   };
-  // console.log("data==", data)
+
   try {
     const response = await axios.post(url, data, {
       headers: {
@@ -434,7 +544,6 @@ async function recipeConversation(userData: any, message: any) {
     return response.data; // Return the response from the server
   } catch (error) {
     console.error('Error in recipe conversation request:', error);
-    throw error; // Propagate the error
   }
 }
 export default ChatbotService;

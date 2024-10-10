@@ -42,5 +42,6 @@ export abstract class MessageService {
   abstract sendFollowRecipe(from: string, localisedStrings: any, result: any);
   abstract sendConversation(from: string, message: any);
   abstract sendButtonsWithRecipeConversation(from: string, localisedStrings: any,message: any);
+  abstract sendlimitreached(from: string, localisedStrings: any);
   abstract sendLanguageChangedMessage(from: string, language: string);
 }

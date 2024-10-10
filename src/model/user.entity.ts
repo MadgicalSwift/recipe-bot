@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn,  } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 import { IsString } from 'class-validator';
 
 @Entity()
@@ -29,7 +29,7 @@ export class User {
 
   @Column({ type: 'text', nullable: true })
   specificDish: string;
-  
+
   @Column({ nullable: true })
   follow_up: string;
 
@@ -41,14 +41,13 @@ export class User {
 
   @Column({ type: 'text', nullable: true })
   chat_summary: string;
-  
-  // @Column({ nullable: true })  
-  // recipe_conversation_Api_No: any;
-  // @IsString()
-  // recipe_conversation_Api_No: number = 0;
 
-  @Column({ type: 'int', nullable: true})
-recipe_conversation_Api_No: number;
+  @Column({ type: 'int', nullable: true })
+  recipe_conversation_Api_No: number;
 
+  @Column({ type: 'int', default: 0 })
+  apiUsageCount: number; // Tracks API usage count
+
+  @Column({ nullable: true })
+  date: Date; // Tracks the last date the API usage was reset
 }
-

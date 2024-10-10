@@ -2,7 +2,14 @@ import { Injectable } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import { LocalizationService } from 'src/localization/localization.service';
 import { MessageService } from 'src/message/message.service';
-import { welcomeButtons, dietaryPreferencesButtons, menuButtons, sendButtonsAfterRecipe, buttonsAfterFollowRecipe, buttonsWithRecipeConversation} from 'src/i18n/buttons/button';
+import {
+  welcomeButtons,
+  dietaryPreferencesButtons,
+  menuButtons,
+  sendButtonsAfterRecipe,
+  buttonsAfterFollowRecipe,
+  buttonsWithRecipeConversation,
+} from 'src/i18n/buttons/button';
 
 dotenv.config();
 
@@ -23,7 +30,6 @@ export class SwiftchatMessageService extends MessageService {
     };
   }
   async sendWelcomeMessage(from: string, localisedStrings: string) {
-    
     const messageData = welcomeButtons(from, localisedStrings);
 
     const response = await this.sendMessage(
@@ -33,19 +39,18 @@ export class SwiftchatMessageService extends MessageService {
     );
     return response;
   }
- 
+
   async askForDietaryPreferences(from: string, localisedStrings: string) {
-  
-    const messageData = dietaryPreferencesButtons(from, localisedStrings)
-  
+    const messageData = dietaryPreferencesButtons(from, localisedStrings);
+
     const response = await this.sendMessage(
-          this.baseUrl,
-          messageData,
-          this.apiKey,
-        );
-        return response;
+      this.baseUrl,
+      messageData,
+      this.apiKey,
+    );
+    return response;
   }
-  
+
   async askForIngredients(from: string, prompt: string) {
     const requestData = this.prepareRequestData(from, prompt);
 
@@ -75,7 +80,6 @@ export class SwiftchatMessageService extends MessageService {
     );
   }
   async askForMissingIngredients(from: string, prompt: string) {
-    
     const requestData = this.prepareRequestData(from, prompt);
     const response = await this.sendMessage(
       this.baseUrl,
@@ -84,28 +88,18 @@ export class SwiftchatMessageService extends MessageService {
     );
   }
 
-  async sendSuggestedRecipe(from:string, localisedStrings: string, result: any, language: string){
-    // const messageContent = `${localisedStrings}\n${result}`;
-
-    // const requestData = this.prepareRequestData(
-    //   from,
-    //   messageContent,
-    // );
+  async sendSuggestedRecipe(
+    from: string,
+    localisedStrings: string,
+    result: any,
+    language: string,
+  ) {
     const strings = LocalizationService.getLocalisedString(language);
-    const requestData =  sendButtonsAfterRecipe(from, localisedStrings, result, strings)
-
-    const response = await this.sendMessage(
-      this.baseUrl,
-      requestData,
-      this.apiKey,
-    );
-    return response;
-  }
-
-  async sendAwesomeRecipePrompt(from: string, localisedStrings: string){
-    const requestData = this.prepareRequestData(
+    const requestData = sendButtonsAfterRecipe(
       from,
       localisedStrings,
+      result,
+      strings,
     );
 
     const response = await this.sendMessage(
@@ -115,10 +109,30 @@ export class SwiftchatMessageService extends MessageService {
     );
     return response;
   }
-  async sendSpecificRecipe(from: string, localisedStrings: string, result: any, language: string){
-    
+
+  async sendAwesomeRecipePrompt(from: string, localisedStrings: string) {
+    const requestData = this.prepareRequestData(from, localisedStrings);
+
+    const response = await this.sendMessage(
+      this.baseUrl,
+      requestData,
+      this.apiKey,
+    );
+    return response;
+  }
+  async sendSpecificRecipe(
+    from: string,
+    localisedStrings: string,
+    result: any,
+    language: string,
+  ) {
     const strings = LocalizationService.getLocalisedString(language);
-    const requestData =  sendButtonsAfterRecipe(from, localisedStrings, result, strings)
+    const requestData = sendButtonsAfterRecipe(
+      from,
+      localisedStrings,
+      result,
+      strings,
+    );
     const response = await this.sendMessage(
       this.baseUrl,
       requestData,
@@ -127,95 +141,77 @@ export class SwiftchatMessageService extends MessageService {
     return response;
   }
 
-  async sendFollowRecipe(from: string, localisedStrings: any, result: any){
-const messageData = buttonsAfterFollowRecipe(from, localisedStrings, result)
-  
-          const response = await this.sendMessage(
-            this.baseUrl,
-            messageData,
-            this.apiKey,
-          );
-          return response;
+  async sendFollowRecipe(from: string, localisedStrings: any, result: any) {
+    const messageData = buttonsAfterFollowRecipe(
+      from,
+      localisedStrings,
+      result,
+    );
+
+    const response = await this.sendMessage(
+      this.baseUrl,
+      messageData,
+      this.apiKey,
+    );
+    return response;
   }
-async mainMenubuttons(from:string, localisedStrings: any){
+  async mainMenubuttons(from: string, localisedStrings: any) {
+    const messageData = menuButtons(from, localisedStrings);
 
-  const messageData = menuButtons(from, localisedStrings)
+    const response = await this.sendMessage(
+      this.baseUrl,
+      messageData,
+      this.apiKey,
+    );
+  }
 
-  const response = await this.sendMessage(
-    this.baseUrl,
-    messageData,
-    this.apiKey
-  )
-}
+  async sendFollowUpPrompt(from: string, localisedStrings: string) {
+    const requestData = this.prepareRequestData(from, localisedStrings);
 
-// async sendButtonsAfterRecipe(from: string, localisedStrings: any){
-//   const messageData = {
-//     to: from,
-//     type: 'button',
-//     button: {
-//         body: {
-//         type: 'text',
-//         text: {
-//             body: 'choose language'
-//         },
-//         },
-//         buttons: [
-//         {
-//             type: 'solid',
-//             body: 'Hindi',
-//             reply: 'Hindi',
-//         },
-//         {
-//             type: 'solid',
-//             body: 'English',
-//             reply: 'English',
-//         },
-//         ],
-//         allow_custom_response: false,
-//     },
-//     };
-// }
+    const response = await this.sendMessage(
+      this.baseUrl,
+      requestData,
+      this.apiKey,
+    );
+    return response;
+  }
 
-async sendFollowUpPrompt(from: string, localisedStrings: string){
-  const requestData = this.prepareRequestData(
-    from,
-    localisedStrings,
-  );
+  async sendConversation(from: string, message: any) {
+    const requestData = this.prepareRequestData(from, message);
 
-  const response = await this.sendMessage(
-    this.baseUrl,
-    requestData,
-    this.apiKey,
-  );
-  return response;
-}
+    const response = await this.sendMessage(
+      this.baseUrl,
+      requestData,
+      this.apiKey,
+    );
+    return response;
+  }
 
+  async sendButtonsWithRecipeConversation(
+    from: string,
+    localisedStrings: any,
+    message: any,
+  ) {
+    const messageData = buttonsWithRecipeConversation(
+      from,
+      localisedStrings,
+      message,
+    );
 
-async sendConversation(from: string, message: any){
-  const requestData = this.prepareRequestData(
-    from,
-    message,
-  );
+    const response = await this.sendMessage(
+      this.baseUrl,
+      messageData,
+      this.apiKey,
+    );
+    return response;
+  }
+  async sendlimitreached(from: string, localisedStrings: any) {
+    const message = this.prepareRequestData(from, localisedStrings);
 
-  const response = await this.sendMessage(
-    this.baseUrl,
-    requestData,
-    this.apiKey,
-  );
-  return response;
-}
+    const response = await this.sendMessage(this.baseUrl, message, this.apiKey);
 
-async sendButtonsWithRecipeConversation(from: string, localisedStrings: any, message: any){
-  const messageData = buttonsWithRecipeConversation(from, localisedStrings, message)
-
-        const response = await this.sendMessage(
-          this.baseUrl,
-          messageData,
-          this.apiKey,
-        );
-        return response;
-}
-
+    return response;
+  }
   async sendLanguageChangedMessage(from: string, language: string) {
     const localisedStrings = LocalizationService.getLocalisedString(language);
     const requestData = this.prepareRequestData(
