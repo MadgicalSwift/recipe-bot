@@ -73,11 +73,7 @@ export class ChatbotService {
       ) {
         userData.dietaryPreference = buttonBody;
         await this.userService.saveUser(userData);
-        await this.message.sendAwesomeRecipePrompt(
-          from,
-          localisedStrings.awesomeRecipePrompt,
-        );
-
+        
         if (userData.date < today) {
           userData.date = today; // Update userData.date to today
           userData.apiUsageCount =
@@ -92,6 +88,10 @@ export class ChatbotService {
           );
           return 'ok';
         }
+        await this.message.sendAwesomeRecipePrompt(
+          from,
+          localisedStrings.awesomeRecipePrompt,
+        );
 
         const result = await suggestRecipe(userData);
         if (!result) {
@@ -331,10 +331,7 @@ export class ChatbotService {
         } else if (userData.specificDish) {
           userData.numberOfPeople = message;
           await this.userService.saveUser(userData);
-          await this.message.sendAwesomeRecipePrompt(
-            from,
-            localisedStrings.awesomeRecipePrompt,
-          );
+         
           if (userData.date < today) {
             userData.date = today; // Update userData.date to today
             userData.apiUsageCount =
@@ -349,7 +346,10 @@ export class ChatbotService {
             );
             return 'ok';
           }
-
+          await this.message.sendAwesomeRecipePrompt(
+            from,
+            localisedStrings.awesomeRecipePrompt,
+          );
           const result = await specificRecipe(userData);
           if (!result) {
             console.log('Result not found');
