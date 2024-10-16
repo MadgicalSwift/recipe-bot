@@ -37,15 +37,12 @@ export class ChatbotService {
     }
     const today = new Date().toISOString().split('T')[0];
 
-    // userData.date = '2024-10-09';
-    // await this.userService.saveUser(userData);
-
     const localisedStrings = LocalizationService.getLocalisedString(
       userData.language,
     );
 
     if (button_response) {
-      const buttonBody = button_response.body;
+      const buttonBody = button_response?.body;
       const trackingData = {
         distinct_id: from,
         button: buttonBody,
@@ -74,18 +71,11 @@ export class ChatbotService {
         userData.dietaryPreference = buttonBody;
         await this.userService.saveUser(userData);
         
-        if (userData.date < today) {
-          userData.date = today; // Update userData.date to today
-          userData.apiUsageCount =
-            typeof userData.apiUsageCount === 'number'
-              ? (userData.apiUsageCount = 0)
-              : 0;
-          await this.userService.saveUser(userData);
-        } else if (userData.apiUsageCount >= 20) {
-          await this.message.sendlimitreached(
-            from,
-            localisedStrings.reacheddailylimit,
-          );
+        
+
+        const { limitReached } = await this.updateUserDateAndUsage(userData, today);
+        if (limitReached) {
+          await this.message.sendlimitreached(from, localisedStrings.reacheddailylimit);
           return 'ok';
         }
         await this.message.sendAwesomeRecipePrompt(
@@ -98,11 +88,7 @@ export class ChatbotService {
           console.log('Result not found');
           return 'ok';
         }
-        userData.date = today;
-        userData.apiUsageCount =
-          typeof userData.apiUsageCount === 'number'
-            ? userData.apiUsageCount + 1
-            : 1;
+       
         userData.full_dish = result;
         await this.userService.saveUser(userData);
         const trackingData = {
@@ -128,7 +114,6 @@ export class ChatbotService {
         userData.specificDish = null;
         userData.selectedRecipeOption = null;
         userData.recipe_conversation_Api_No = 0;
-        // userData.missingIngredients = null;
         userData.chat_history = [];
         userData.chat_summary = '';
       } else if (buttonBody === localisedStrings.optionFollowUp) {
@@ -138,30 +123,17 @@ export class ChatbotService {
           localisedStrings.followUpPrompt,
         );
       } else if (buttonBody === localisedStrings.helpByAIOption) {
-        if (userData.date < today) {
-          userData.date = today; // Update userData.date to today
-          userData.apiUsageCount =
-            typeof userData.apiUsageCount === 'number'
-              ? (userData.apiUsageCount = 0)
-              : 0;
-          await this.userService.saveUser(userData);
-        } else if (userData.apiUsageCount >= 20) {
-          await this.message.sendlimitreached(
-            from,
-            localisedStrings.reacheddailylimit,
-          );
+    
+        const { limitReached } = await this.updateUserDateAndUsage(userData, today);
+        if (limitReached) {
+          await this.message.sendlimitreached(from, localisedStrings.reacheddailylimit);
           return 'ok';
         }
-
         const response = await recipeConversation(userData, buttonBody);
         userData.selectedRecipeOption = null;
         userData.chat_history = response.full_history;
         userData.chat_summary = response.summary_history;
-        userData.date = today;
-        userData.apiUsageCount =
-          typeof userData.apiUsageCount === 'number'
-            ? userData.apiUsageCount + 1
-            : 1;
+       
 
         userData.recipe_conversation_Api_No =
           typeof userData.recipe_conversation_Api_No === 'number'
@@ -170,18 +142,10 @@ export class ChatbotService {
 
         await this.message.sendConversation(from, response.response);
       } else if (buttonBody === localisedStrings.continueQueryOption) {
-        if (userData.date < today) {
-          userData.date = today; // Update userData.date to today
-          userData.apiUsageCount =
-            typeof userData.apiUsageCount === 'number'
-              ? (userData.apiUsageCount = 0)
-              : 0;
-          await this.userService.saveUser(userData);
-        } else if (userData.apiUsageCount >= 20) {
-          await this.message.sendlimitreached(
-            from,
-            localisedStrings.reacheddailylimit,
-          );
+        
+        const { limitReached } = await this.updateUserDateAndUsage(userData, today);
+        if (limitReached) {
+          await this.message.sendlimitreached(from, localisedStrings.reacheddailylimit);
           return 'ok';
         }
         const response = await recipeConversation(userData, buttonBody);
@@ -190,11 +154,7 @@ export class ChatbotService {
         userData.chat_history = response.full_history;
         userData.chat_summary = response.summary_history;
         userData.recipe_conversation_Api_No += 1;
-        userData.date = today;
-        userData.apiUsageCount =
-          typeof userData.apiUsageCount === 'number'
-            ? userData.apiUsageCount + 1
-            : 1;
+      
         await this.userService.saveUser(userData);
 
         if (userData.recipe_conversation_Api_No >= 5) {
@@ -215,7 +175,7 @@ export class ChatbotService {
       await this.userService.saveUser(userData);
       return 'ok';
     } else {
-      const message = text.body;
+      const message = text?.body;
       const selectedRecipeOption = userData.selectedRecipeOption;
 
       // Handle text responses based on user choice (ingredients or specific dish)
@@ -240,21 +200,12 @@ export class ChatbotService {
 
           const fullDish = userData.full_dish;
 
-          if (userData.date < today) {
-            userData.date = today; // Update userData.date to today
-            userData.apiUsageCount =
-              typeof userData.apiUsageCount === 'number'
-                ? (userData.apiUsageCount = 0)
-                : 0;
-            await this.userService.saveUser(userData);
-          } else if (userData.apiUsageCount >= 20) {
-            await this.message.sendlimitreached(
-              from,
-              localisedStrings.reacheddailylimit,
-            );
+        
+          const { limitReached } = await this.updateUserDateAndUsage(userData, today);
+          if (limitReached) {
+            await this.message.sendlimitreached(from, localisedStrings.reacheddailylimit);
             return 'ok';
           }
-
           const response = await followUpDish(userData, message, fullDish);
           if (!response) {
             console.log('response not found');
@@ -263,11 +214,7 @@ export class ChatbotService {
 
           userData.chat_history = response.full_history;
           userData.chat_summary = response.summary_history;
-          userData.date = today;
-          userData.apiUsageCount =
-            typeof userData.apiUsageCount === 'number'
-              ? userData.apiUsageCount + 1
-              : 1;
+         
           await this.userService.saveUser(userData);
 
           await this.message.sendFollowRecipe(
@@ -294,18 +241,11 @@ export class ChatbotService {
           await this.userService.saveUser(userData);
 
           const fullDish = userData.full_dish;
-          if (userData.date < today) {
-            userData.date = today; // Update userData.date to today
-            userData.apiUsageCount =
-              typeof userData.apiUsageCount === 'number'
-                ? (userData.apiUsageCount = 0)
-                : 0;
-            await this.userService.saveUser(userData);
-          } else if (userData.apiUsageCount >= 20) {
-            await this.message.sendlimitreached(
-              from,
-              localisedStrings.reacheddailylimit,
-            );
+          
+         
+          const { limitReached } = await this.updateUserDateAndUsage(userData, today);
+          if (limitReached) {
+            await this.message.sendlimitreached(from, localisedStrings.reacheddailylimit);
             return 'ok';
           }
           const response = await followUpDish(userData, message, fullDish);
@@ -316,11 +256,7 @@ export class ChatbotService {
 
           userData.chat_history = response.full_history;
           userData.chat_summary = response.summary_history;
-          userData.date = today;
-          userData.apiUsageCount =
-            typeof userData.apiUsageCount === 'number'
-              ? userData.apiUsageCount + 1
-              : 1;
+       
           await this.userService.saveUser(userData);
 
           await this.message.sendFollowRecipe(
@@ -332,18 +268,10 @@ export class ChatbotService {
           userData.numberOfPeople = message;
           await this.userService.saveUser(userData);
          
-          if (userData.date < today) {
-            userData.date = today; // Update userData.date to today
-            userData.apiUsageCount =
-              typeof userData.apiUsageCount === 'number'
-                ? (userData.apiUsageCount = 0)
-                : 0;
-            await this.userService.saveUser(userData);
-          } else if (userData.apiUsageCount >= 20) {
-            await this.message.sendlimitreached(
-              from,
-              localisedStrings.reacheddailylimit,
-            );
+         
+          const { limitReached } = await this.updateUserDateAndUsage(userData, today);
+          if (limitReached) {
+            await this.message.sendlimitreached(from, localisedStrings.reacheddailylimit);
             return 'ok';
           }
           await this.message.sendAwesomeRecipePrompt(
@@ -356,11 +284,7 @@ export class ChatbotService {
             return 'ok';
           }
 
-          userData.apiUsageCount =
-            typeof userData.apiUsageCount === 'number'
-              ? userData.apiUsageCount + 1
-              : 1;
-          userData.date = today;
+          
           userData.full_dish = result;
           await this.userService.saveUser(userData);
           const trackingData = {
@@ -396,27 +320,15 @@ export class ChatbotService {
           );
         }
       } else {
-        if (userData.date < today) {
-          userData.date = today; // Update userData.date to today
-          userData.apiUsageCount =
-            typeof userData.apiUsageCount === 'number'
-              ? (userData.apiUsageCount = 0)
-              : 0;
-          await this.userService.saveUser(userData);
-        } else if (userData.apiUsageCount >= 20) {
-          await this.message.sendlimitreached(
-            from,
-            localisedStrings.reacheddailylimit,
-          );
+        
+        const { limitReached } = await this.updateUserDateAndUsage(userData, today);
+        if (limitReached) {
+          await this.message.sendlimitreached(from, localisedStrings.reacheddailylimit);
           return 'ok';
         }
         const response = await recipeConversation(userData, message);
 
-        userData.apiUsageCount =
-          typeof userData.apiUsageCount === 'number'
-            ? userData.apiUsageCount + 1
-            : 1;
-        userData.date = today;
+       
         userData.selectedRecipeOption = null;
         userData.chat_history = response.full_history;
         userData.chat_summary = response.summary_history;
@@ -449,6 +361,26 @@ export class ChatbotService {
 
     return 'ok';
   }
+
+  private async updateUserDateAndUsage(userData: any, today: string): Promise<any> {
+    if (userData.date < today) {
+      console.log("updating date and set apiUsageCount 0")
+      userData.date = today;
+      userData.apiUsageCount = 0; // Reset the usage count for a new day
+    } else if (userData.apiUsageCount >= 20) {
+      console.log("Limit reached")
+      return { limitReached: true };
+    } else {
+     
+      userData.apiUsageCount = typeof userData.apiUsageCount === 'number'
+        ? userData.apiUsageCount + 1
+        : 1;
+    }
+    await this.userService.saveUser(userData);
+    console.log("userData.apiUsageCount after +1==", userData.apiUsageCount)
+    return { limitReached: false };
+  }
+   
 }
 
 async function followUpDish(userData: any, message: string, fullDish: any) {

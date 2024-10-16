@@ -37,7 +37,7 @@ export class User {
   full_dish: string;
 
   @Column({ type: 'text', nullable: true })
-  chat_history: any;
+  chat_history: string;
 
   @Column({ type: 'text', nullable: true })
   chat_summary: string;
