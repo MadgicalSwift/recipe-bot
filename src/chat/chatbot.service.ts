@@ -364,20 +364,16 @@ export class ChatbotService {
 
   private async updateUserDateAndUsage(userData: any, today: string): Promise<any> {
     if (userData.date < today) {
-      console.log("updating date and set apiUsageCount 0")
       userData.date = today;
       userData.apiUsageCount = 0; // Reset the usage count for a new day
     } else if (userData.apiUsageCount >= 20) {
-      console.log("Limit reached")
       return { limitReached: true };
     } else {
-     
       userData.apiUsageCount = typeof userData.apiUsageCount === 'number'
         ? userData.apiUsageCount + 1
         : 1;
     }
     await this.userService.saveUser(userData);
-    console.log("userData.apiUsageCount after +1==", userData.apiUsageCount)
     return { limitReached: false };
   }
    
