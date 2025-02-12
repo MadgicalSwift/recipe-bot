@@ -44,4 +44,6 @@ export abstract class MessageService {
   abstract sendButtonsWithRecipeConversation(from: string, localisedStrings: any,message: any);
   abstract sendlimitreached(from: string, localisedStrings: any);
   abstract sendLanguageChangedMessage(from: string, language: string);
+  abstract sendYouTubeLinks(apiKey, from, recipeName, language);
+  abstract sendYouTubeLinks1(apiKey, from, title, language);
 }

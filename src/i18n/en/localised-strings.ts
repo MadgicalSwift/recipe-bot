@@ -27,5 +27,6 @@ export const localisedStrings = {
   language_hindi: 'हिन्दी',
   language_english: 'English',
   language_changed: 'Language changed to English',
+  query:"Can u please suggest videos for this  recipe",
 };
  

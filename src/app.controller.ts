@@ -28,7 +28,6 @@ export class AppController {
     try {
       const { from, text } = body;
       this.chatbotService.processMessage(body);
-      // log(body.from, text.body);
       res.status(200).send({
         status: {
           code: 0,

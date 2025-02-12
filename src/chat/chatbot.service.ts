@@ -102,6 +102,8 @@ export class ChatbotService {
 
         const recipeName = result.split('\n')[0].trim();
         const recipeSuggestion = localisedStrings.recipeSuggestion(recipeName);
+        console.log(recipeName);
+        
         await this.message.sendSuggestedRecipe(
           from,
           recipeSuggestion,
@@ -301,8 +303,11 @@ export class ChatbotService {
             .replace(/.*:\s*/, '')
             .replace(/^\*\*\s*/, '')
             .trim();
-          const modifiedRecipeSuggestion =
-            localisedStrings.specificRecipeSuggestion(title);
+
+          console.log("Extracted Title:", title); 
+          const modifiedRecipeSuggestion =localisedStrings.specificRecipeSuggestion(title); 
+
+
           await this.message.sendSpecificRecipe(
             from,
             modifiedRecipeSuggestion,
@@ -314,6 +319,7 @@ export class ChatbotService {
           userData.dietaryPreference = 'null';
           userData.ingredientsList = 'null';
           await this.userService.saveUser(userData);
+          
           await this.message.askForServingSize(
             from,
             localisedStrings.servingSizePrompt,
@@ -330,6 +336,7 @@ export class ChatbotService {
 
        
         userData.selectedRecipeOption = null;
+        console.log(response);
         userData.chat_history = response.full_history;
         userData.chat_summary = response.summary_history;
         userData.recipe_conversation_Api_No =
