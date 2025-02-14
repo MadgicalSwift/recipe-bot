@@ -111,7 +111,7 @@ export class SwiftchatMessageService extends MessageService {
       result,
       strings,
     );
-
+     
     const response = await this.sendMessage(
       this.baseUrl,
       requestData,
@@ -154,12 +154,19 @@ export class SwiftchatMessageService extends MessageService {
   }
 
   async sendFollowRecipe(from: string, localisedStrings: any, result: any) {
+    const titleMatch = result.match(/^(?:.*?:\s*)?\*\*?(.*?)\*\*/);
+        const title = titleMatch ? titleMatch[1].trim() : '';
+        console.log(title);
+        // If title is present, call sendYouTubeLinks1
+        if (title) {
+            await this.sendYouTubeLinks1(this.apiKey, from, title, "english");
+        }
     const messageData = buttonsAfterFollowRecipe(
       from,
       localisedStrings,
       result,
     );
-
+     
     const response = await this.sendMessage(
       this.baseUrl,
       messageData,
@@ -179,7 +186,7 @@ export class SwiftchatMessageService extends MessageService {
 
   async sendFollowUpPrompt(from: string, localisedStrings: string) {
     const requestData = this.prepareRequestData(from, localisedStrings);
-
+     
     const response = await this.sendMessage(
       this.baseUrl,
       requestData,

@@ -1,14 +1,16 @@
-#  Chatbot NestJS Boilerplate
+#  Food Magic Bot
 
-In this comprehensive guide, we introduce you to our Chatbot Starter Kit, a resource designed to empower developers in building robust chatbot applications. Whether you are just starting your journey in chatbot development or are an experienced developer seeking an efficient solution, this document is your go-to resource for mastering the use of our starter kit.
-
+ Welcome to Food Magic Bot, your ultimate AI cooking companion! Whether you have a few ingredients at home or a specific dish in mind, this bot helps you discover the perfect recipe in seconds
+ 1. Ingredient-Based Recipes: Enter the ingredients you have, and the bot will suggest delicious recipes you can make with them.
+ 2. Dish-Specific Recipe Search: Looking for a specific dish? Get the best recipes and cooking tips instantly.
+ 3. YouTube Video Integration: The bot fetches relevant YouTube video links, so you can follow step-by-step instructions visually.
 
 # Prerequisites
 Before you begin, ensure you have met the following requirements:
 
 * Node.js and npm installed
 * Nest.js CLI installed (npm install -g @nestjs/cli)
-* MySQL database accessible
+* DynomoDB database accessible
 
 ## Getting Started
 ### Installation
@@ -22,7 +24,7 @@ https://github.com/madgicaltechdom/chatbot-nestjs-boilerplate.git
 ```
 * Navigate to the Project Directory:
 ```
-cd chatbot-nestjs-boilerplate
+cd recipe-bot
 ```
 * Install Project Dependencies:
 ```bash
@@ -58,13 +60,21 @@ $ npm run test:cov
 # Add the following environment variables:
 
 ```bash
-API_URL = API_URL
-BOT_ID = BOT_ID
-API_KEY = API_KEY
-DATA_BASE=DATA_BASE
-DB_HOST=DB_HOST
-DB_USER=DB_USER
-DB_PASSWORD=DB_PASSWORD
+
+youtube_apiKey=youtube_apikey
+youtube_url=youtube_url
+API_URL = api_url
+BOT_ID = bot_id
+API_KEY = api_key
+USERS_TABLE=user_table
+REGION= region
+ACCESS_KEY_ID = access_key_id
+SECRET_ACCESS_KEY = secret_access_key
+BOT_NAME = bot_name
+SUGGEST_RECIPE_URL = suggest_recipe_url
+SPECIFIC_RECIPE_URL = specific_recipe_url
+FOLLOW_UP_URL= follow_up_url
+RECIPE_COVERSATION_URL = recipe_conversation_url
 ```
 # API Endpoints
 ```

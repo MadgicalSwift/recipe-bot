@@ -84,6 +84,8 @@ export class ChatbotService {
         );
 
         const result = await suggestRecipe(userData);
+        //console.log(result);
+        console.log("h");
         if (!result) {
           console.log('Result not found');
           return 'ok';
@@ -102,7 +104,6 @@ export class ChatbotService {
 
         const recipeName = result.split('\n')[0].trim();
         const recipeSuggestion = localisedStrings.recipeSuggestion(recipeName);
-        console.log(recipeName);
         
         await this.message.sendSuggestedRecipe(
           from,
@@ -120,18 +121,20 @@ export class ChatbotService {
         userData.chat_summary = '';
       } else if (buttonBody === localisedStrings.optionFollowUp) {
         userData.follow_up = 'yes';
-        await this.message.sendFollowUpPrompt(
-          from,
-          localisedStrings.followUpPrompt,
-        );
+        await this.message.sendFollowUpPrompt(from, localisedStrings.followUpPrompt,);
+        //..............................................
+         
+        //..............................................
+       
       } else if (buttonBody === localisedStrings.helpByAIOption) {
-    
+         
         const { limitReached } = await this.updateUserDateAndUsage(userData, today);
         if (limitReached) {
           await this.message.sendlimitreached(from, localisedStrings.reacheddailylimit);
           return 'ok';
         }
         const response = await recipeConversation(userData, buttonBody);
+        
         userData.selectedRecipeOption = null;
         userData.chat_history = response.full_history;
         userData.chat_summary = response.summary_history;
@@ -201,14 +204,15 @@ export class ChatbotService {
           await this.userService.saveUser(userData);
 
           const fullDish = userData.full_dish;
-
-        
+          
+         
           const { limitReached } = await this.updateUserDateAndUsage(userData, today);
           if (limitReached) {
             await this.message.sendlimitreached(from, localisedStrings.reacheddailylimit);
             return 'ok';
           }
           const response = await followUpDish(userData, message, fullDish);
+          
           if (!response) {
             console.log('response not found');
             return 'ok';
@@ -244,7 +248,7 @@ export class ChatbotService {
 
           const fullDish = userData.full_dish;
           
-         
+          
           const { limitReached } = await this.updateUserDateAndUsage(userData, today);
           if (limitReached) {
             await this.message.sendlimitreached(from, localisedStrings.reacheddailylimit);
@@ -289,12 +293,8 @@ export class ChatbotService {
           
           userData.full_dish = result;
           await this.userService.saveUser(userData);
-          const trackingData = {
-            distinct_id: from,
-            recipe: result,
-            botID: botID,
-          };
-
+          const trackingData = {distinct_id: from,recipe: result, botID: botID,};
+      
           // Track button click using Mixpanel
           this.mixpanel.track('Specific_Recipe', trackingData);
 
@@ -304,9 +304,9 @@ export class ChatbotService {
             .replace(/^\*\*\s*/, '')
             .trim();
 
-          console.log("Extracted Title:", title); 
+          
           const modifiedRecipeSuggestion =localisedStrings.specificRecipeSuggestion(title); 
-
+           
 
           await this.message.sendSpecificRecipe(
             from,
@@ -336,7 +336,7 @@ export class ChatbotService {
 
        
         userData.selectedRecipeOption = null;
-        console.log(response);
+        
         userData.chat_history = response.full_history;
         userData.chat_summary = response.summary_history;
         userData.recipe_conversation_Api_No =
@@ -373,7 +373,7 @@ export class ChatbotService {
     if (userData.date < today) {
       userData.date = today;
       userData.apiUsageCount = 0; // Reset the usage count for a new day
-    } else if (userData.apiUsageCount >= 20) {
+    } else if (userData.apiUsageCount >= 100) {
       return { limitReached: true };
     } else {
       userData.apiUsageCount = typeof userData.apiUsageCount === 'number'
