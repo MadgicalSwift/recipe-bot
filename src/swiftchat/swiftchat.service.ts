@@ -156,8 +156,6 @@ export class SwiftchatMessageService extends MessageService {
   async sendFollowRecipe(from: string, localisedStrings: any, result: any) {
     const titleMatch = result.match(/^(?:.*?:\s*)?\*\*?(.*?)\*\*/);
         const title = titleMatch ? titleMatch[1].trim() : '';
-        console.log(title);
-        // If title is present, call sendYouTubeLinks1
         if (title) {
             await this.sendYouTubeLinks1(this.apiKey, from, title, "english");
         }

@@ -84,8 +84,6 @@ export class ChatbotService {
         );
 
         const result = await suggestRecipe(userData);
-        //console.log(result);
-        console.log("h");
         if (!result) {
           console.log('Result not found');
           return 'ok';
@@ -373,7 +371,7 @@ export class ChatbotService {
     if (userData.date < today) {
       userData.date = today;
       userData.apiUsageCount = 0; // Reset the usage count for a new day
-    } else if (userData.apiUsageCount >= 20) {
+    } else if (userData.apiUsageCount >= 50) {
       return { limitReached: true };
     } else {
       userData.apiUsageCount = typeof userData.apiUsageCount === 'number'
